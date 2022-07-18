@@ -16,53 +16,52 @@
 package com.uber.rib.compose.root
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.ViewGroup
-import com.uber.rib.compose.link.Destination
+import com.ericliu.navigation.Destination
+import com.uber.rib.compose.link.*
 import com.uber.rib.core.RibActivity
 import com.uber.rib.core.ViewRouter
-import io.reactivex.Observable
+import com.uber.rib.core.coroutineScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import motif.Creatable
 import motif.Expose
 import motif.NoDependencies
 import motif.ScopeFactory
 
 class RootActivity : RibActivity() {
-  private val  destinationRegistry by lazy { initNavGraph() }
+    private val uriChannel = Channel<Uri>()
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    intent?.let {
-      handleIntent(it)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        intent?.let {
+            handleIntent(it)
+        }
     }
-  }
 
-  override fun onNewIntent(intent: Intent) {
-    super.onNewIntent(intent)
-    handleIntent(intent)
-  }
-
-  override fun createRouter(parentViewGroup: ViewGroup): ViewRouter<*, *> {
-    return ScopeFactory.create(Parent::class.java)
-      .rootScope(this, findViewById(android.R.id.content))
-      .router()
-  }
-
-  private fun handleIntent(intent: Intent) {
-    intent.data?.let { uri ->
-      if (destinationRegistry.containsKey(uri.toString())) {
-        val destination = destinationRegistry[uri.toString()]
-        run
-      }
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
     }
-  }
 
-  private fun initNavGraph(): Map<String, Destination> {
-    TODO("Not yet implemented")
-  }
+    override fun createRouter(parentViewGroup: ViewGroup): ViewRouter<*, *> {
+        return ScopeFactory.create(Parent::class.java)
+            .rootScope(this, findViewById(android.R.id.content), uriChannel)
+            .router()
+    }
 
-  @motif.Scope
-  interface Parent : Creatable<NoDependencies> {
-    fun rootScope(@Expose activity: RibActivity, parentViewGroup: ViewGroup): RootScope
-  }
+    private fun handleIntent(intent: Intent) {
+        intent.data?.let { uri ->
+            coroutineScope.launch {
+                uriChannel.send(uri)
+            }
+        }
+    }
+
+    @motif.Scope
+    interface Parent : Creatable<NoDependencies> {
+        fun rootScope(@Expose activity: RibActivity, parentViewGroup: ViewGroup, uriChannel: Channel<Uri>): RootScope
+    }
 }

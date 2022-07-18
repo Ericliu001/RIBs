@@ -34,7 +34,7 @@ class RootRouter(
     detachMain()
   }
 
-  private fun attachMain() {
+   fun attachMain() {
     if (mainRouter == null) {
       mainRouter = scope.mainScope(view).router().also {
         attachChild(it)

@@ -15,6 +15,7 @@
  */
 package com.uber.rib.compose.root.main.logged_in.off_game
 
+import com.uber.rib.compose.link.OffGameDestination
 import com.uber.rib.compose.root.main.logged_in.ScoreStream
 import com.uber.rib.compose.util.EventStream
 import com.uber.rib.compose.util.StateStream
@@ -24,13 +25,15 @@ import com.uber.rib.core.ComposePresenter
 import com.uber.rib.core.coroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class OffGameInteractor(
   presenter: ComposePresenter,
   private val eventStream: EventStream<OffGameEvent>,
   private val stateStream: StateStream<OffGameViewModel>,
   private val scoreStream: ScoreStream,
-  private val listener: Listener
+  private val listener: Listener,
+  private val offGameDestination: OffGameDestination,
 ) : BasicInteractor<ComposePresenter, OffGameRouter>(presenter) {
 
   override fun didBecomeActive(savedInstanceState: Bundle?) {
@@ -55,6 +58,12 @@ class OffGameInteractor(
           )
         )
       }.launchIn(coroutineScope)
+
+
+    coroutineScope.launch {
+      offGameDestination
+        .commandChannel()
+    }
   }
 
   interface Listener {

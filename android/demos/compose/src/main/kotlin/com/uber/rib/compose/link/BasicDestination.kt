@@ -4,7 +4,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 
-class BasicDestination(val parent: Destination) : Destination {
+open class BasicDestination(val parent: Destination) : Destination {
     private val commandsChannel = Channel<String>()
     private val updatesChannel = Channel<String>()
 
@@ -13,7 +13,7 @@ class BasicDestination(val parent: Destination) : Destination {
         parent.requestChild(this)
     }
 
-   override  suspend fun requestChild(child: Destination) {
+    override suspend fun requestChild(child: Destination) {
         commandsChannel.send(child.javaClass.canonicalName)
         val receive = updatesChannel.receive()
         if (receive == child.javaClass.canonicalName) {

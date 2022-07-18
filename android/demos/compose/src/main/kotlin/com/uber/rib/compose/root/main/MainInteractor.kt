@@ -15,17 +15,20 @@
  */
 package com.uber.rib.compose.root.main
 
+import com.uber.rib.compose.link.MainDestination
 import com.uber.rib.core.BasicInteractor
 import com.uber.rib.core.Bundle
 import com.uber.rib.core.ComposePresenter
 import com.uber.rib.core.coroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class MainInteractor(
   presenter: ComposePresenter,
   private val authStream: AuthStream,
-  private val childContent: MainRouter.ChildContent
+  private val childContent: MainRouter.ChildContent,
+  private val mainDestination: MainDestination,
 ) : BasicInteractor<ComposePresenter, MainRouter>(presenter) {
 
   override fun didBecomeActive(savedInstanceState: Bundle?) {
@@ -42,5 +45,17 @@ class MainInteractor(
           router.attachLoggedOut()
         }
       }.launchIn(coroutineScope)
+
+    coroutineScope.launch {
+      mainDestination
+        .commandChannel()
+        .receive()
+
+      authStream.accept(AuthInfo(true, "playerOne", "playerTwo"))
+
+      mainDestination
+        .updatesChannel()
+        .send("")
+    }
   }
 }

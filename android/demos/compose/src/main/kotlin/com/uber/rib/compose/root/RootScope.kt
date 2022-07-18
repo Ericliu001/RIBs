@@ -18,6 +18,7 @@ package com.uber.rib.compose.root
 import android.view.ViewGroup
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
+import com.uber.rib.compose.link.NavGraphObjects
 import com.uber.rib.compose.root.main.MainScope
 import com.uber.rib.compose.util.AnalyticsClient
 import com.uber.rib.compose.util.AnalyticsClientImpl
@@ -36,7 +37,7 @@ interface RootScope {
   fun mainScope(parentViewGroup: ViewGroup): MainScope
 
   @motif.Objects
-  abstract class Objects {
+  abstract class Objects: NavGraphObjects {
     abstract fun router(): RootRouter
 
     abstract fun interactor(): RootInteractor

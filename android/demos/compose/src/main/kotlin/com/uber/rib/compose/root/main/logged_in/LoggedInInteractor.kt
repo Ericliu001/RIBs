@@ -15,6 +15,7 @@
  */
 package com.uber.rib.compose.root.main.logged_in
 
+import com.uber.rib.compose.link.LoggedInDestination
 import com.uber.rib.compose.root.main.AuthInfo
 import com.uber.rib.compose.root.main.AuthStream
 import com.uber.rib.compose.root.main.logged_in.off_game.OffGameInteractor
@@ -33,7 +34,8 @@ class LoggedInInteractor(
   private val authInfo: AuthInfo,
   private val authStream: AuthStream,
   private val eventStream: EventStream<LoggedInEvent>,
-  private val scoreStream: ScoreStream
+  private val scoreStream: ScoreStream,
+  private val loggedInDestination: LoggedInDestination,
 ) : BasicInteractor<ComposePresenter, LoggedInRouter>(presenter),
   OffGameInteractor.Listener,
   TicTacToeInteractor.Listener {
@@ -50,6 +52,18 @@ class LoggedInInteractor(
       .launchIn(coroutineScope)
 
     router.attachOffGame(authInfo)
+
+    coroutineScope.launch {
+      loggedInDestination
+        .commandChannel()
+        .receive()
+
+      router.attachOffGame(authInfo)
+
+      loggedInDestination
+        .updatesChannel()
+        .send("")
+    }
   }
 
   override fun onStartGame() {

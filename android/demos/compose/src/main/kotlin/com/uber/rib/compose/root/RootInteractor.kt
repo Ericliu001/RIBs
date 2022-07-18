@@ -15,7 +15,42 @@
  */
 package com.uber.rib.compose.root
 
+import android.net.Uri
+import com.uber.rib.compose.link.OffGameDestination
+import com.uber.rib.compose.link.RootDestination
 import com.uber.rib.core.BasicInteractor
+import com.uber.rib.core.Bundle
 import com.uber.rib.core.EmptyPresenter
+import com.uber.rib.core.coroutineScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
-class RootInteractor(presenter: EmptyPresenter) : BasicInteractor<EmptyPresenter, RootRouter>(presenter)
+class RootInteractor(
+    presenter: EmptyPresenter,
+    val rootDestination: RootDestination,
+    val uriChannel: Channel<Uri>,
+    val offGameDestination: OffGameDestination
+) :
+    BasicInteractor<EmptyPresenter, RootRouter>(presenter) {
+
+    override fun didBecomeActive(savedInstanceState: Bundle?) {
+        super.didBecomeActive(savedInstanceState)
+        coroutineScope.launch {
+            val command = rootDestination
+                .commandChannel()
+                .receive()
+
+            router.attachMain()
+            rootDestination.updatesChannel().send("")
+        }
+
+        coroutineScope.launch {
+            val receiveAsFlow = uriChannel.receiveAsFlow().collect { uri ->
+
+                offGameDestination.navigate()
+            }
+        }
+    }
+}
