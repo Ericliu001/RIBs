@@ -16,6 +16,7 @@
 package com.uber.rib.compose.root
 
 import android.net.Uri
+import com.ericliu.navigation.NavEvent
 import com.uber.rib.compose.link.OffGameNavNode
 import com.uber.rib.compose.link.RootNavNode
 import com.uber.rib.core.BasicInteractor
@@ -43,7 +44,7 @@ class RootInteractor(
                 .receive()
 
             router.attachMain()
-            rootNavNode.eventsChannel().send("")
+            rootNavNode.eventsChannel().send(NavEvent(""))
         }
 
         coroutineScope.launch {

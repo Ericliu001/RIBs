@@ -15,7 +15,10 @@
  */
 package com.uber.rib.compose.root.main.logged_in
 
+import com.ericliu.navigation.NavCommand
+import com.ericliu.navigation.NavEvent
 import com.uber.rib.compose.link.LoggedInNavNode
+import com.uber.rib.compose.link.OffGameNavNode
 import com.uber.rib.compose.root.main.AuthInfo
 import com.uber.rib.compose.root.main.AuthStream
 import com.uber.rib.compose.root.main.logged_in.off_game.OffGameInteractor
@@ -30,53 +33,55 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class LoggedInInteractor(
-  presenter: ComposePresenter,
-  private val authInfo: AuthInfo,
-  private val authStream: AuthStream,
-  private val eventStream: EventStream<LoggedInEvent>,
-  private val scoreStream: ScoreStream,
-  private val loggedInNavNode: LoggedInNavNode,
+    presenter: ComposePresenter,
+    private val authInfo: AuthInfo,
+    private val authStream: AuthStream,
+    private val eventStream: EventStream<LoggedInEvent>,
+    private val scoreStream: ScoreStream,
+    private val loggedInNavNode: LoggedInNavNode,
 ) : BasicInteractor<ComposePresenter, LoggedInRouter>(presenter),
-  OffGameInteractor.Listener,
-  TicTacToeInteractor.Listener {
+    OffGameInteractor.Listener,
+    TicTacToeInteractor.Listener {
 
-  override fun didBecomeActive(savedInstanceState: Bundle?) {
-    super.didBecomeActive(savedInstanceState)
+    override fun didBecomeActive(savedInstanceState: Bundle?) {
+        super.didBecomeActive(savedInstanceState)
 
-    eventStream.observe()
-      .onEach {
-        when (it) {
-          is LoggedInEvent.LogOutClick -> authStream.accept(AuthInfo(false))
+        eventStream.observe()
+            .onEach {
+                when (it) {
+                    is LoggedInEvent.LogOutClick -> authStream.accept(AuthInfo(false))
+                }
+            }
+            .launchIn(coroutineScope)
+
+        router.attachOffGame(authInfo)
+
+        coroutineScope.launch {
+            val navCommand: NavCommand = loggedInNavNode
+                .commandChannel()
+                .receive()
+
+            if (navCommand.destinationClass == OffGameNavNode::javaClass) {
+                router.attachOffGame(authInfo)
+            }
+
+            loggedInNavNode
+                .eventsChannel()
+                .send(NavEvent(""))
         }
-      }
-      .launchIn(coroutineScope)
-
-    router.attachOffGame(authInfo)
-
-    coroutineScope.launch {
-      loggedInNavNode
-        .commandChannel()
-        .receive()
-
-      router.attachOffGame(authInfo)
-
-      loggedInNavNode
-        .eventsChannel()
-        .send("")
-    }
-  }
-
-  override fun onStartGame() {
-    router.detachOffGame()
-    router.attachTicTacToe(authInfo)
-  }
-
-  override fun onGameWon(winner: String?) {
-    if (winner != null) {
-      coroutineScope.launch { scoreStream.addVictory(winner) }
     }
 
-    router.detachTicTacToe()
-    router.attachOffGame(authInfo)
-  }
+    override fun onStartGame() {
+        router.detachOffGame()
+        router.attachTicTacToe(authInfo)
+    }
+
+    override fun onGameWon(winner: String?) {
+        if (winner != null) {
+            coroutineScope.launch { scoreStream.addVictory(winner) }
+        }
+
+        router.detachTicTacToe()
+        router.attachOffGame(authInfo)
+    }
 }

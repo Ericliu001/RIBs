@@ -15,6 +15,7 @@
  */
 package com.uber.rib.compose.root.main
 
+import com.ericliu.navigation.NavEvent
 import com.uber.rib.compose.link.MainNavNode
 import com.uber.rib.core.BasicInteractor
 import com.uber.rib.core.Bundle
@@ -55,7 +56,7 @@ class MainInteractor(
 
       mainNavNode
         .eventsChannel()
-        .send("")
+        .send(NavEvent(""))
     }
   }
 }

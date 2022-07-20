@@ -4,19 +4,19 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 
-open class BasicNavNode(val parent: NavNode) : NavNode {
-    private val commandsChannel = Channel<String>()
-    private val eventsChannel = Channel<String>()
+class BasicNavNode(val parent: NavNode) : NavNode {
+    private val commandsChannel = Channel<NavCommand>()
+    private val eventsChannel = Channel<NavEvent>()
 
-    override suspend fun navigate() {
-        parent.navigate()
+    override suspend fun navigate(args: Map<String, String>) {
+        parent.navigate(args)
         parent.requestChild(this)
     }
 
-    override suspend fun requestChild(child: NavNode) {
-        commandsChannel.send(child.javaClass.canonicalName)
+    override suspend fun requestChild(child: NavNode, args: Map<String, String>) {
+        commandsChannel.send(NavCommand(child.javaClass, args))
         val receive = eventsChannel.receive()
-        if (receive == child.javaClass.canonicalName) {
+        if (receive.placeholder == "placeholder") {
             // Log child attached.
         }
     }
@@ -25,11 +25,11 @@ open class BasicNavNode(val parent: NavNode) : NavNode {
         parent.navigate()
     }
 
-    override fun commandChannel(): ReceiveChannel<String> {
+    override fun commandChannel(): ReceiveChannel<NavCommand> {
         return commandsChannel
     }
 
-    override fun eventsChannel(): SendChannel<String> {
+    override fun eventsChannel(): SendChannel<NavEvent> {
         return eventsChannel
     }
 }
