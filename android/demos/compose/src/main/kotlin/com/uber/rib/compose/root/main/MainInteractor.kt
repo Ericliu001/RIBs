@@ -28,7 +28,7 @@ class MainInteractor(
     presenter: ComposePresenter,
     private val authStream: AuthStream,
     private val childContent: MainRouter.ChildContent,
-    private val mainDestination: MainNavNode,
+    private val mainNavNode: MainNavNode,
 ) : BasicInteractor<ComposePresenter, MainRouter>(presenter) {
 
   override fun didBecomeActive(savedInstanceState: Bundle?) {
@@ -47,13 +47,13 @@ class MainInteractor(
       }.launchIn(coroutineScope)
 
     coroutineScope.launch {
-      mainDestination
+      mainNavNode
         .commandChannel()
         .receive()
 
       authStream.accept(AuthInfo(true, "playerOne", "playerTwo"))
 
-      mainDestination
+      mainNavNode
         .eventsChannel()
         .send("")
     }

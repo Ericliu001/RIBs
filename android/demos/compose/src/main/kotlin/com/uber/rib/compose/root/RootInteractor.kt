@@ -29,27 +29,27 @@ import kotlinx.coroutines.launch
 
 class RootInteractor(
     presenter: EmptyPresenter,
-    val rootDestination: RootNavNode,
+    val rootNavNode: RootNavNode,
     val uriChannel: Channel<Uri>,
-    val offGameDestination: OffGameNavNode
+    val offGameNavNode: OffGameNavNode
 ) :
     BasicInteractor<EmptyPresenter, RootRouter>(presenter) {
 
     override fun didBecomeActive(savedInstanceState: Bundle?) {
         super.didBecomeActive(savedInstanceState)
         coroutineScope.launch {
-            val command = rootDestination
+            val command = rootNavNode
                 .commandChannel()
                 .receive()
 
             router.attachMain()
-            rootDestination.eventsChannel().send("")
+            rootNavNode.eventsChannel().send("")
         }
 
         coroutineScope.launch {
             val receiveAsFlow = uriChannel.receiveAsFlow().collect { uri ->
 
-                offGameDestination.navigate()
+                offGameNavNode.navigate()
             }
         }
     }

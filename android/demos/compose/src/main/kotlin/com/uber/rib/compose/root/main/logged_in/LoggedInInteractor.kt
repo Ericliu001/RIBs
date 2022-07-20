@@ -35,7 +35,7 @@ class LoggedInInteractor(
   private val authStream: AuthStream,
   private val eventStream: EventStream<LoggedInEvent>,
   private val scoreStream: ScoreStream,
-  private val loggedInDestination: LoggedInNavNode,
+  private val loggedInNavNode: LoggedInNavNode,
 ) : BasicInteractor<ComposePresenter, LoggedInRouter>(presenter),
   OffGameInteractor.Listener,
   TicTacToeInteractor.Listener {
@@ -54,13 +54,13 @@ class LoggedInInteractor(
     router.attachOffGame(authInfo)
 
     coroutineScope.launch {
-      loggedInDestination
+      loggedInNavNode
         .commandChannel()
         .receive()
 
       router.attachOffGame(authInfo)
 
-      loggedInDestination
+      loggedInNavNode
         .eventsChannel()
         .send("")
     }

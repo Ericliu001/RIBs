@@ -3,22 +3,22 @@ package com.uber.rib.compose.link
 import motif.Expose
 
 interface NavGraphObjects {
-    fun dummyDestination(): DummyNavNode {
+    fun dummyNavNode(): DummyNavNode {
         return DummyNavNode()
     }
 
     @Expose
-    fun rootDestination(dummyDestination: DummyNavNode): RootNavNode {
-        return RootNavNode(dummyDestination)
+    fun rootNavNode(dummyNavNode: DummyNavNode): RootNavNode {
+        return RootNavNode(dummyNavNode)
     }
 
     @Expose
-    fun mainDestination(rootDestination: RootNavNode) = MainNavNode(rootDestination)
+    fun mainNavNode(rootNavNode: RootNavNode) = MainNavNode(rootNavNode)
 
     @Expose
-    fun loggedInDestination(mainDestination: MainNavNode) = LoggedInNavNode(mainDestination)
+    fun loggedInNavNode(mainNavNode: MainNavNode) = LoggedInNavNode(mainNavNode)
 
     @Expose
-    fun offGameDestination(loggedInDestination: LoggedInNavNode) =
-        OffGameNavNode(loggedInDestination)
+    fun offGameNavNode(loggedInNavNode: LoggedInNavNode) =
+        OffGameNavNode(loggedInNavNode)
 }

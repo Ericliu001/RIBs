@@ -33,7 +33,7 @@ class OffGameInteractor(
     private val stateStream: StateStream<OffGameViewModel>,
     private val scoreStream: ScoreStream,
     private val listener: Listener,
-    private val offGameDestination: OffGameNavNode,
+    private val offGameNavNode: OffGameNavNode,
 ) : BasicInteractor<ComposePresenter, OffGameRouter>(presenter) {
 
   override fun didBecomeActive(savedInstanceState: Bundle?) {
@@ -61,7 +61,7 @@ class OffGameInteractor(
 
 
     coroutineScope.launch {
-      offGameDestination
+      offGameNavNode
         .commandChannel()
     }
   }
