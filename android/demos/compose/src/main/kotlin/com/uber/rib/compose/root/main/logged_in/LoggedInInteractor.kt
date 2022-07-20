@@ -15,7 +15,7 @@
  */
 package com.uber.rib.compose.root.main.logged_in
 
-import com.uber.rib.compose.link.LoggedInDestination
+import com.uber.rib.compose.link.LoggedInNavNode
 import com.uber.rib.compose.root.main.AuthInfo
 import com.uber.rib.compose.root.main.AuthStream
 import com.uber.rib.compose.root.main.logged_in.off_game.OffGameInteractor
@@ -35,7 +35,7 @@ class LoggedInInteractor(
   private val authStream: AuthStream,
   private val eventStream: EventStream<LoggedInEvent>,
   private val scoreStream: ScoreStream,
-  private val loggedInDestination: LoggedInDestination,
+  private val loggedInDestination: LoggedInNavNode,
 ) : BasicInteractor<ComposePresenter, LoggedInRouter>(presenter),
   OffGameInteractor.Listener,
   TicTacToeInteractor.Listener {
@@ -61,7 +61,7 @@ class LoggedInInteractor(
       router.attachOffGame(authInfo)
 
       loggedInDestination
-        .updatesChannel()
+        .eventsChannel()
         .send("")
     }
   }

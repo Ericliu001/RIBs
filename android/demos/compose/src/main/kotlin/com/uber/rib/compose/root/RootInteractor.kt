@@ -16,8 +16,8 @@
 package com.uber.rib.compose.root
 
 import android.net.Uri
-import com.uber.rib.compose.link.OffGameDestination
-import com.uber.rib.compose.link.RootDestination
+import com.uber.rib.compose.link.OffGameNavNode
+import com.uber.rib.compose.link.RootNavNode
 import com.uber.rib.core.BasicInteractor
 import com.uber.rib.core.Bundle
 import com.uber.rib.core.EmptyPresenter
@@ -29,9 +29,9 @@ import kotlinx.coroutines.launch
 
 class RootInteractor(
     presenter: EmptyPresenter,
-    val rootDestination: RootDestination,
+    val rootDestination: RootNavNode,
     val uriChannel: Channel<Uri>,
-    val offGameDestination: OffGameDestination
+    val offGameDestination: OffGameNavNode
 ) :
     BasicInteractor<EmptyPresenter, RootRouter>(presenter) {
 
@@ -43,7 +43,7 @@ class RootInteractor(
                 .receive()
 
             router.attachMain()
-            rootDestination.updatesChannel().send("")
+            rootDestination.eventsChannel().send("")
         }
 
         coroutineScope.launch {

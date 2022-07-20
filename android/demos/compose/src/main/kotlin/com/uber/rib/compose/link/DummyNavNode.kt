@@ -1,18 +1,17 @@
 package com.uber.rib.compose.link
 
-import com.ericliu.navigation.BasicDestination
-import com.ericliu.navigation.Destination
+import com.ericliu.navigation.NavNode
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 
-class DummyDestination: Destination  {
+class DummyNavNode: NavNode  {
     override suspend fun navigate() {
         /* no-op */
         return
     }
 
-    override suspend fun requestChild(child: Destination) {
+    override suspend fun requestChild(child: NavNode) {
         /* no-op */
         return
     }
@@ -25,7 +24,7 @@ class DummyDestination: Destination  {
         return Channel(0)
     }
 
-    override fun updatesChannel(): SendChannel<String> {
+    override fun eventsChannel(): SendChannel<String> {
         return Channel(0)
     }
 }

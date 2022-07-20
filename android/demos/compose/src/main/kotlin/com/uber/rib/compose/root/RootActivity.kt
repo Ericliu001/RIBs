@@ -19,8 +19,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.ViewGroup
-import com.ericliu.navigation.Destination
-import com.uber.rib.compose.link.*
 import com.uber.rib.core.RibActivity
 import com.uber.rib.core.ViewRouter
 import com.uber.rib.core.coroutineScope

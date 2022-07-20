@@ -4,32 +4,32 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 
-open class BasicDestination(val parent: Destination) : Destination {
+open class BasicNavNode(val parent: NavNode) : NavNode {
     private val commandsChannel = Channel<String>()
-    private val updatesChannel = Channel<String>()
+    private val eventsChannel = Channel<String>()
 
     override suspend fun navigate() {
         parent.navigate()
         parent.requestChild(this)
     }
 
-    override suspend fun requestChild(child: Destination) {
+    override suspend fun requestChild(child: NavNode) {
         commandsChannel.send(child.javaClass.canonicalName)
-        val receive = updatesChannel.receive()
+        val receive = eventsChannel.receive()
         if (receive == child.javaClass.canonicalName) {
             // Log child attached.
         }
     }
 
     override suspend fun back() {
-        TODO("Not yet implemented")
+        parent.navigate()
     }
 
     override fun commandChannel(): ReceiveChannel<String> {
         return commandsChannel
     }
 
-    override fun updatesChannel(): SendChannel<String> {
-        return updatesChannel
+    override fun eventsChannel(): SendChannel<String> {
+        return eventsChannel
     }
 }
