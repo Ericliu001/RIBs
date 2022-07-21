@@ -21,8 +21,14 @@ class BasicNavNode(val parent: NavNode) : NavNode {
         }
     }
 
+    override fun canHandleBack(): Boolean {
+        return false
+    }
+
     override suspend fun back() {
-        parent.navigate()
+        if (parent.canHandleBack()) {
+            parent.navigate()
+        }
     }
 
     override fun commandChannel(): ReceiveChannel<NavCommand> {

@@ -18,6 +18,10 @@ class DummyNavNode : NavNode {
         return
     }
 
+    override fun canHandleBack(): Boolean {
+        return false
+    }
+
     override suspend fun back() {
         /* no-op */
     }

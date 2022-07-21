@@ -18,7 +18,6 @@ package com.uber.rib.compose.root.main.logged_in
 import com.ericliu.navigation.NavCommand
 import com.ericliu.navigation.NavEvent
 import com.uber.rib.compose.link.LoggedInNavNode
-import com.uber.rib.compose.link.OffGameNavNode
 import com.uber.rib.compose.root.main.AuthInfo
 import com.uber.rib.compose.root.main.AuthStream
 import com.uber.rib.compose.root.main.logged_in.off_game.OffGameInteractor
@@ -61,9 +60,8 @@ class LoggedInInteractor(
                 .commandChannel()
                 .receive()
 
-            if (navCommand.destinationClass == OffGameNavNode::javaClass) {
-                router.attachOffGame(authInfo)
-            }
+            router.detachTicTacToe()
+            router.attachOffGame(authInfo)
 
             loggedInNavNode
                 .eventsChannel()

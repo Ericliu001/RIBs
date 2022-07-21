@@ -49,7 +49,6 @@ class RootInteractor(
 
         coroutineScope.launch {
             val receiveAsFlow = uriChannel.receiveAsFlow().collect { uri ->
-
                 offGameNavNode.navigate()
             }
         }
